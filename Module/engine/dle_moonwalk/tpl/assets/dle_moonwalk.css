@@ -1,0 +1,125 @@
+.dle_moonwalk_block {
+    margin-bottom: 15px;
+}
+
+.dle_moonwalk_block_date {
+    background-color: #6f6f6f;
+    color: #fff;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 7px 20px;
+}
+
+.dle_moonwalk_block_list .a-m-d {
+    display: block;
+    position: relative;
+}
+
+.dle_moonwalk_block_list .a-m-d:after {
+    -webkit-transition: background-color 0.2s linear;
+    -moz-transition: background-color 0.2s linear;
+    -ms-transition: background-color 0.2s linear;
+    -o-transition: background-color 0.2s linear;
+    transition: background-color 0.2s linear;
+    background-color: rgba(0, 0, 0, 0);
+    content: "";
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+}
+
+.dle_moonwalk_block_list .a-m-d:hover:after {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.dle_moonwalk_block_list_item {
+    -webkit-transition: background-color 0.2s linear;
+    -moz-transition: background-color 0.2s linear;
+    -ms-transition: background-color 0.2s linear;
+    -o-transition: background-color 0.2s linear;
+    transition: background-color 0.2s linear;
+    background-color: #fff;
+    border-bottom: 1px solid #ccc;
+    cursor: pointer;
+    display: table;
+    min-height: 35px;
+    width: 100%;
+}
+
+.dle_moonwalk_block_list_item:hover {
+    background-color: #fafafa;
+}
+
+.dle_moonwalk_block_list_item:hover .b-seriesupdate__block_list_link {
+    color: #2e859e;
+    text-decoration: none;
+}
+
+.dle_moonwalk_block_list_item.tracked {
+    background-color: #d6f0ff;
+}
+
+.dle_moonwalk_block_list_item.tracked:hover {
+    background-color: #a8dfff;
+}
+
+.dle_moonwalk_block_list_item.tracked:hover .b-seriesupdate__block_list_link {
+    color: #000;
+}
+
+.dle_moonwalk_block_list_item_inner {
+    display: table-row;
+}
+
+.dle_moonwalk_block_list_item_inner .cell {
+    padding: 6px 0 5px;
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.dle_moonwalk_block_list_item_inner .cell-1 {
+    color: #000;
+    font-size: 12px;
+    padding-right: 5px;
+    padding-left: 10px;
+}
+
+.dle_moonwalk_block_list_item_inner .cell-1 .season {
+    white-space: nowrap;
+}
+
+.dle_moonwalk_block_list_item_inner .cell-2 {
+    color: #000;
+    font-size: 11px;
+    font-weight: bold;
+    padding-right: 10px;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.dle_moonwalk_block_list_item_inner .cell-2 i {
+    color: #777;
+    display: block;
+    font-style: normal;
+}
+
+.dle_moonwalk_block_list_link {
+    -webkit-transition: color 0.2s ease-in-out;
+    -moz-transition: color 0.2s ease-in-out;
+    -ms-transition: color 0.2s ease-in-out;
+    -o-transition: color 0.2s ease-in-out;
+    transition: color 0.2s ease-in-out;
+    color: #000;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.dle_moonwalk_block_list_link:hover {
+    text-decoration: none;
+}
+
+.dle_moonwalk_block_list_link:visited {
+    color: #000;
+}
