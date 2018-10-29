@@ -15,7 +15,7 @@ require_once ENGINE_DIR .'/dle_moonwalk/language/dle_moonwalk.lng';
 require_once ENGINE_DIR . '/dle_moonwalk/config/dle_moonwalk.php';
 require_once ENGINE_DIR . '/dle_moonwalk/admin/class.admin.php';
 
-$dle_moonwalk_config['version'] = '1.1.1';
+$dle_moonwalk_config['version'] = '1.1.2';
 
 $admin = new AdminTemplate($db, $member_id, $user_group, $config, $dle_moonwalk_config, $dle_moonwalk_lang, $cat_info, $dle_login_hash);
 
