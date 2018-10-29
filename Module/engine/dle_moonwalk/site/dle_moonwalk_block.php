@@ -2,8 +2,8 @@
 /**
  * DLE Moonwalk
  *
- * @copyright 2018 LazyDev (https://lazydev.pro)
- * @version   1.1.1
+ * @copyright 2018 LazyDev
+ * @version   1.1.2
  * @link      https://lazydev.pro
  */
  
@@ -13,10 +13,11 @@ $dateSort = 'updateDate';
 if ($dle_moonwalk_config['block']['moonwalk_block_date']) {
 	$dateSort = 'updateMoonwalk';
 }
+
 $sqlType = [];
-if ($type) {
-	$type = explode(',', $type);
-	foreach ($type as $value) {
+if ($video) {
+	$video = explode(',', $video);
+	foreach ($video as $value) {
 		if ($value == 'movie') {
 			$sqlType[] = 0;
 		} elseif ($value == 'serial') {
@@ -28,6 +29,7 @@ $findType = '';
 if ($sqlType) {
 	$findType = 'AND d.typeVideo IN(' . implode(',', $sqlType) . ')';
 }
+
 $sqlCat = [];
 if ($cat) {
 	$cat = explode(',', $cat);
@@ -43,8 +45,9 @@ if ($cat) {
 }
 $findCat = '';
 if ($sqlCat) {
-	$findCat = 'AND d.category IN(' . implode(',', $sqlType) . ')';
+	$findCat = 'AND d.category IN(' . implode(',', $sqlCat) . ')';
 }
+
 $cache = dle_cache('news_moonwalk_block', $config['skin'] . $findCat . $findType, false);
 if ($cache) {
 	echo $cache;

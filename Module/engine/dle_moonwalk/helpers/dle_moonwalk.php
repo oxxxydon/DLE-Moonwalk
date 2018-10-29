@@ -2,8 +2,8 @@
 /**
  * DLE Moonwalk
  *
- * @copyright 2018 LazyDev (https://lazydev.pro)
- * @version   1.1.1
+ * @copyright 2018 LazyDev
+ * @version   1.1.2
  * @link      https://lazydev.pro
  */
  
@@ -197,12 +197,13 @@ class dleMoonwalk
 		$json = json_decode($json, true);
 		
 		$dataArray = [];
+		$fieldData = self::$moonwalk_config['data'];
 		
 		if (self::$moonwalk_config[$type]['change_meta'] == 1 && self::$moonwalk_config[$type]['meta_title'] != '') {
-			$metaTitle = self::$moonwalk_config[$type]['meta_title'];
+			$fieldData['meta_title'] = self::$moonwalk_config[$type]['meta_title'];
 		}
 		
-		$keys = ['title_ru', 'title_en', 'translator', 'year', 'description', 'countries', 'actors', 'genres', 'directors', 'age', 'kinopoisk_rating', 'kinopoisk_votes', 'imdb_rating', 'imdb_votes', 'iframe_url', 'trailer_iframe_url', 'kinopoisk_id', 'world_art_id'];
+		$keys = ['title_ru', 'title_en', 'translator', 'year', 'description', 'countries', 'actors', 'genres', 'directors', 'age', 'kinopoisk_rating', 'kinopoisk_votes', 'imdb_rating', 'imdb_votes', 'iframe_url', 'trailer_iframe_url', 'kinopoisk_id', 'world_art_id', 'duration', 'quality'];
 		foreach ($keys as $key) {
 			if ($json[$key]) {
 				$dataArray[$key] = stripslashes($json[$key]);
@@ -228,7 +229,6 @@ class dleMoonwalk
 			$season = $season['season_number'];
 		}
 		
-		$fieldData = self::$moonwalk_config['data'];
 		foreach ($fieldData as $field => $data) {
 			$tempData = $data;
 			foreach ($keys as $key) {
@@ -301,40 +301,43 @@ class dleMoonwalk
 			}
 			
 			$fieldData[$field] = $tempData;
-			
-			if (strpos($metaTitle, '{'.$key.'}') !== false) {
-				$metaTitle = str_replace('{' . $key . '}', $dataArray[$key] ?: '', $metaTitle);
-			}
-			
-			if (strpos($metaTitle, '[tag-' . $key . ']') !== false) {
-				$metaTitle = preg_replace('#\[tag-' . $key . '\](.*?)\[\/tag-' . $key . '\]#is', ($dataArray[$key] != '' ? '$1' : ''), $metaTitle);
-			}
 		}
 		
-		if ($metaTitle) {
-			$fieldData['meta_title'] = $metaTitle;
-		}
+		// if ($metaTitle) {
+			// $fieldData['meta_title'] = $metaTitle;
+		// }
 		
-		if (self::$moonwalk_config[$type]['change_meta'] == 1 && $fieldData['meta_title'] != '' && $type == 'serial') {
-			$seasonFormat = self::switchType($season, self::$moonwalk_config['serial']['meta_season_format'], 'season');
-			$seriaFormat = self::switchType($seria, self::$moonwalk_config['serial']['meta_seria_format'], 'seria');
+		// if (self::$moonwalk_config[$type]['change_meta'] == 1 && $fieldData['meta_title'] != '' && $type == 'serial') {
+			// if (strpos($fieldData['meta_title'], '{season}') !== false) {
+				// $fieldData['meta_title'] = str_replace('{season}', $season, $fieldData['meta_title']);
+			// }
 			
-			if (strpos($fieldData['meta_title'], '{season}') !== false) {
-				$fieldData['meta_title'] = str_replace('{season}', $season, $fieldData['meta_title']);
-			}
+			// if (strpos($fieldData['meta_title'], '{seria}') !== false) {
+				// $fieldData['meta_title'] = str_replace('{seria}', $seria, $fieldData['meta_title']);
+			// }
 			
-			if (strpos($fieldData['meta_title'], '{seria}') !== false) {
-				$fieldData['meta_title'] = str_replace('{seria}', $seria, $fieldData['meta_title']);
-			}
+			// if (strpos($fieldData['meta_title'], '{season-format-') !== false) {
+				// preg_match('#{season-format-([0-9]+)}#is', $fieldData['meta_title'], $tagSeasonFormat);
+				// if ($tagSeasonFormat[1]) {
+					// $fieldData['meta_title'] = str_replace('{season-format-' . $tagSeasonFormat[1] . '}', self::switchType($season, $tagSeasonFormat[1], 'season'), $fieldData['meta_title']);
+					// $fieldData['meta_title'] = preg_replace('#\[tag-season-format-' . $tagSeasonFormat[1] . '\](.*?)\[\/tag-season-format-' . $tagSeasonFormat[1] . '\]#is', '$1', $fieldData['meta_title']);
+				// } else {
+					// $fieldData['meta_title'] = preg_replace('#\[tag-season-format-([0-9]+)\](.*?)\[\/tag-season-format-([0-9]+)\]#is', '', $fieldData['meta_title']);
+					// $fieldData['meta_title'] = preg_replace('#{season-format-([0-9]+)}#is', '', $fieldData['meta_title']);
+				// }
+			// }
 			
-			if (strpos($fieldData['meta_title'], '{season-format}') !== false) {
-				$fieldData['meta_title'] = str_replace('{season-format}', $seasonFormat, $fieldData['meta_title']);
-			}
-			
-			if (strpos($fieldData['meta_title'], '{seria-format}') !== false) {
-				$fieldData['meta_title'] = str_replace('{seria-format}', $seriaFormat, $fieldData['meta_title']);
-			}
-		}
+			// if (strpos($fieldData['meta_title'], '{seria-format-') !== false) {
+				// preg_match('#{seria-format-([0-9]+)}#is', $fieldData['meta_title'], $tagSeriaFormat);
+				// if ($tagSeriaFormat[1]) {
+					// $fieldData['meta_title'] = str_replace('{seria-format-' . $tagSeriaFormat[1] . '}', self::switchType($seria, $tagSeriaFormat[1], 'seria'), $fieldData['meta_title']);
+					// $fieldData['meta_title'] = preg_replace('#\[tag-seria-format-' . $tagSeriaFormat[1] . '\](.*?)\[\/tag-seria-format-' . $tagSeriaFormat[1] . '\]#is', '$1', $fieldData['meta_title']);
+				// } else {
+					// $fieldData['meta_title'] = preg_replace('#\[tag-seria-format-([0-9]+)\](.*?)\[\/tag-seria-format-([0-9]+)\]#is', '', $fieldData['meta_title']);
+					// $fieldData['meta_title'] = preg_replace('#{seria-format-([0-9]+)}#is', '', $fieldData['meta_title']);
+				// }
+			// }
+		// }
 		$dataJson = ['api' => $fieldData, 'config' => ['editor' => self::$dle_config['allow_admin_wysiwyg']]];
 		return json_encode($dataJson);
 	}

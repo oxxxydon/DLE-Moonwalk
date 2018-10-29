@@ -2,8 +2,8 @@
 /**
  * DLE Moonwalk
  *
- * @copyright 2018 LazyDev (https://lazydev.pro)
- * @version   1.1.1
+ * @copyright 2018 LazyDev
+ * @version   1.1.2
  * @link      https://lazydev.pro
  */
 
