@@ -34,19 +34,19 @@ if (file_exists(ENGINE_DIR . '/classes/plugins.class.php')) {
 	require_once ENGINE_DIR . '/modules/sitelogin.php';
 
 }
-require_once ENGINE_DIR . '/dle_moonwalk/language/dle_moonwalk.lng';
+require_once ENGINE_DIR . '/dle_moonwalk/language/dle_moonwalk_admin_lang.lng';
 @header("Content-type: text/html; charset=" . $config['charset']);
 
 date_default_timezone_set($config['date_adjust']);
 $_TIME = time();
 if (!$is_logged || $member_id['user_group'] != 1) {
-	echo json_encode(['head' => $dle_moonwalk_lang['error'], 'text' => $dle_moonwalk_lang[94], 'icon' => 'error']);
+	echo json_encode(['head' => $dle_moonwalk_admin_lang['error'], 'text' => $dle_moonwalk_admin_lang[109], 'icon' => 'error']);
 	exit;
 }
 
 $_POST['user_hash'] = trim($_POST['user_hash']);
 if ($_POST['user_hash'] == '' || $_POST['user_hash'] != $dle_login_hash) {
-	echo json_encode(['head' => $dle_moonwalk_lang['error'], 'text' => $dle_moonwalk_lang[94], 'icon' => 'error']);
+	echo json_encode(['head' => $dle_moonwalk_admin_lang['error'], 'text' => $dle_moonwalk_admin_lang[109], 'icon' => 'error']);
 	exit;
 }
 
@@ -61,7 +61,7 @@ if ($action == 'searchAdmin') {
 	$searchData = isset($_POST['searchData']) ? trim(strip_tags($_POST['searchData'])) : false;
 
 	if (!$searchData) {
-		echo json_encode(['head' => $dle_moonwalk_lang['error'], 'text' => $dle_moonwalk_lang[130], 'icon' => 'error']);
+		echo json_encode(['head' => $dle_moonwalk_admin_lang['error'], 'text' => $dle_moonwalk_admin_lang[110], 'icon' => 'error']);
 		exit;
 	}
 
@@ -69,9 +69,9 @@ if ($action == 'searchAdmin') {
 		$chooseDb = 'moonwalk';
 	}
 	
-	echo dleMoonwalk::realize()->config($config, $dle_moonwalk_config, $dle_moonwalk_lang)->parseAdmin($fieldChoose, $chooseDb, $searchData)->templateAdmin();
+	echo dleMoonwalk::realize()->config($config, $dle_moonwalk_config, $dle_moonwalk_admin_lang)->parseAdmin($fieldChoose, $chooseDb, $searchData)->templateAdmin();
 } elseif ($action == 'setData') {
 	$type = isset($_POST['type']) ? trim(strip_tags($_POST['type'])) : false;
 	$token = isset($_POST['token']) ? trim(strip_tags($_POST['token'])) : false;
-	echo dleMoonwalk::realize()->config($config, $dle_moonwalk_config, $dle_moonwalk_lang)->setData($type, $token);
+	echo dleMoonwalk::realize()->config($config, $dle_moonwalk_config, $dle_moonwalk_admin_lang)->setData($type, $token);
 }

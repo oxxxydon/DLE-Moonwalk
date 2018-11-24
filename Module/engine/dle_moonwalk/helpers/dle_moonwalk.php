@@ -3,7 +3,7 @@
  * DLE Moonwalk
  *
  * @copyright 2018 LazyDev
- * @version   1.1.2
+ * @version   1.1.3
  * @link      https://lazydev.pro
  */
  
@@ -18,14 +18,12 @@ class dleMoonwalk
 	private static $cache_type = '', $cache_id = '';
 	private static $api = [
 		'db' => [
-			'moonwalk' => 'http://dlemoon.online/api',
-			'pornodb' => 'http://pornodb.co/api'
+			'moonwalk' => 'http://dlemoon.online/api'
 		],
 		'field' => [
 			'title' => 'title',
 			'id_kinopoisk' => 'kinopoisk_id',
-			'id_worldart' => 'world_art_id',
-			'id_pornolab' => 'pornolab_id'
+			'id_worldart' => 'world_art_id'
 		]
 	];
 	private static $json;
@@ -79,7 +77,7 @@ class dleMoonwalk
 		$jsonDecode = json_decode(self::$json, true);
 		if ($jsonDecode['error'] != '') {
 			if ($jsonDecode['error'] == 'videos_not_found') {
-				return json_encode(['error' => self::$moonwalk_lang[139]]);
+				return json_encode(['error' => self::$moonwalk_lang[96]]);
 			}
 			return self::$json;
 		} else {
@@ -94,7 +92,7 @@ class dleMoonwalk
 					}
 				}
 				
-				$type = $array['type'] == 'movie' ? self::$moonwalk_lang[131] : self::$moonwalk_lang[132];
+				$type = $array['type'] == 'movie' ? self::$moonwalk_lang[97] : self::$moonwalk_lang[98];
 				$title = '';
 				if ($array['title_ru'] != '') {
 					$title = stripslashes($array['title_ru']);
@@ -155,7 +153,7 @@ class dleMoonwalk
 			}
 			
 			if (!$result['content']) {
-				$result['error'] = self::$moonwalk_lang[139];
+				$result['error'] = self::$moonwalk_lang[96];
 			}
 			
 			$result = json_encode($result);
@@ -235,15 +233,18 @@ class dleMoonwalk
 				if ($key == 'iframe_url') {
 					$tempData = preg_replace('#\[tag-video\](.*?)\[\/tag-video\]#is', ($dataArray[$key] != '' ? '$1' : ''), $tempData);
 					if (self::$moonwalk_config['main']['ssl']) {
-						$dataArray[$key] = preg_replace("#http(s)?://[^/]+/#iu", "https://streamguard.cc/", $dataArray[$key]);
+						$dataArray[$key] = preg_replace("#http(s)?://[^/]+/#iu", 'https://streamguard.cc/', $dataArray[$key]);
 					} elseif (self::$moonwalk_config['main']['domain'] != '') {
-						$dataArray[$key] = preg_replace("#http(s)?://[^/]+/#iu", "http://" . self::$moonwalk_config['main']['domain'] . "/", $dataArray[$key]);
+						$dataArray[$key] = preg_replace("#http(s)?://[^/]+/#iu", 'http://' . self::$moonwalk_config['main']['domain'] . '/', $dataArray[$key]);
 					}
 					$tempData = str_replace('{video}', $dataArray[$key], $tempData);
 				} elseif($key == 'trailer_iframe_url') {
 					$tempData = preg_replace('#\[tag-trailer\](.*?)\[\/tag-trailer\]#is', ($dataArray[$key] != '' ? '$1' : ''), $tempData);
 					$tempData = str_replace('{trailer}', $dataArray[$key], $tempData);
 				} else {
+					if ($key == 'title_ru' || $key == 'title_en') {
+						$tempData = preg_replace('#\[tag-not-' . $key . '\](.*?)\[\/tag-not-' . $key . '\]#is', ($dataArray[$key] != '' ? '' : '$1'), $tempData);
+					}
 					$tempData = preg_replace('#\[tag-' . $key . '\](.*?)\[\/tag-' . $key . '\]#is', ($dataArray[$key] != '' ? '$1' : ''), $tempData);
 					$tempData = str_replace('{' . $key . '}', $dataArray[$key], $tempData);
 				}
@@ -303,41 +304,6 @@ class dleMoonwalk
 			$fieldData[$field] = $tempData;
 		}
 		
-		// if ($metaTitle) {
-			// $fieldData['meta_title'] = $metaTitle;
-		// }
-		
-		// if (self::$moonwalk_config[$type]['change_meta'] == 1 && $fieldData['meta_title'] != '' && $type == 'serial') {
-			// if (strpos($fieldData['meta_title'], '{season}') !== false) {
-				// $fieldData['meta_title'] = str_replace('{season}', $season, $fieldData['meta_title']);
-			// }
-			
-			// if (strpos($fieldData['meta_title'], '{seria}') !== false) {
-				// $fieldData['meta_title'] = str_replace('{seria}', $seria, $fieldData['meta_title']);
-			// }
-			
-			// if (strpos($fieldData['meta_title'], '{season-format-') !== false) {
-				// preg_match('#{season-format-([0-9]+)}#is', $fieldData['meta_title'], $tagSeasonFormat);
-				// if ($tagSeasonFormat[1]) {
-					// $fieldData['meta_title'] = str_replace('{season-format-' . $tagSeasonFormat[1] . '}', self::switchType($season, $tagSeasonFormat[1], 'season'), $fieldData['meta_title']);
-					// $fieldData['meta_title'] = preg_replace('#\[tag-season-format-' . $tagSeasonFormat[1] . '\](.*?)\[\/tag-season-format-' . $tagSeasonFormat[1] . '\]#is', '$1', $fieldData['meta_title']);
-				// } else {
-					// $fieldData['meta_title'] = preg_replace('#\[tag-season-format-([0-9]+)\](.*?)\[\/tag-season-format-([0-9]+)\]#is', '', $fieldData['meta_title']);
-					// $fieldData['meta_title'] = preg_replace('#{season-format-([0-9]+)}#is', '', $fieldData['meta_title']);
-				// }
-			// }
-			
-			// if (strpos($fieldData['meta_title'], '{seria-format-') !== false) {
-				// preg_match('#{seria-format-([0-9]+)}#is', $fieldData['meta_title'], $tagSeriaFormat);
-				// if ($tagSeriaFormat[1]) {
-					// $fieldData['meta_title'] = str_replace('{seria-format-' . $tagSeriaFormat[1] . '}', self::switchType($seria, $tagSeriaFormat[1], 'seria'), $fieldData['meta_title']);
-					// $fieldData['meta_title'] = preg_replace('#\[tag-seria-format-' . $tagSeriaFormat[1] . '\](.*?)\[\/tag-seria-format-' . $tagSeriaFormat[1] . '\]#is', '$1', $fieldData['meta_title']);
-				// } else {
-					// $fieldData['meta_title'] = preg_replace('#\[tag-seria-format-([0-9]+)\](.*?)\[\/tag-seria-format-([0-9]+)\]#is', '', $fieldData['meta_title']);
-					// $fieldData['meta_title'] = preg_replace('#{seria-format-([0-9]+)}#is', '', $fieldData['meta_title']);
-				// }
-			// }
-		// }
 		$dataJson = ['api' => $fieldData, 'config' => ['editor' => self::$dle_config['allow_admin_wysiwyg']]];
 		return json_encode($dataJson);
 	}
@@ -345,19 +311,31 @@ class dleMoonwalk
 	
 	public static function switchType($data, $cfg, $type)
 	{
-		$type = $type == 'seria' ? self::$moonwalk_lang[140] : self::$moonwalk_lang[141];
-		switch($cfg) {
-			case 1:
-				return $data . $type;
-				break;
-			case 2:
-				return '1-' . $data . $type;
-				break;
-			case 3:
-				$data = implode(',', range(1, $data));
-				return $data . $type;
-			break;
+		$type = $type == 'seria' ? self::$moonwalk_lang[99] : self::$moonwalk_lang[100];
+		if ($data == 1) {
+			$rerunData = $data . $type;
+		} else {
+			switch($cfg) {
+				case 1:
+					$rerunData = $data . $type;
+					break;
+				case 2:
+					$rerunData = '1-' . $data . $type;
+					break;
+				case 3:
+					$rerunData = implode(',', range(1, $data)) . $type;
+					break;
+				case 4:
+					if ($data > 3) {
+						$rerunData = '1-' . ($data - 2) . ',' . (implode(',', range($data - 1, $data))) . $type;
+					} else {
+						$rerunData = '1-' . $data . $type;
+					}
+					break;
+			}
 		}
+		
+		return $rerunData;
 	}
 	
 	public static function curl($url)

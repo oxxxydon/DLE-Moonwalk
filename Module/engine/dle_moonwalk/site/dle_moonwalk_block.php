@@ -3,7 +3,7 @@
  * DLE Moonwalk
  *
  * @copyright 2018 LazyDev
- * @version   1.1.2
+ * @version   1.1.3
  * @link      https://lazydev.pro
  */
  
@@ -55,9 +55,36 @@ if ($cache) {
 }
 
 if ($dle_moonwalk_config['block']['one_voice']) {
-	$db->query("SELECT d.voice, d.season, d.seria, d.updateDate, d.moonwalkCategory, d.updateMoonwalk, d.quality, d.typeVideo, d.translatorId, p.title, p.id, p.date, p.category, p.xfields, p.alt_name FROM ( SELECT IF(q.newsId = @p_news_id,0,1) AS is_max, q.id, @p_news_id := q.newsId AS newsId, q.voice, q.season, q.seria, q.updateDate, q.updateMoonwalk, q.category as moonwalkCategory, q.quality, q.typeVideo, q.translatorId FROM ( SELECT @p_news_id := NULL ) r CROSS JOIN " . PREFIX . "_dle_moonwalk q ORDER BY q.newsId DESC, q.season DESC, q.seria DESC, q.{$dateSort} DESC ) d LEFT JOIN " . PREFIX . "_post p ON(d.newsId=p.id) WHERE d.is_max AND d.{$dateSort} >= DATE_SUB(CURRENT_DATE, INTERVAL {$dle_moonwalk_config['block']['block_date']} DAY) AND p.approve=1 {$findCat} {$findType} ORDER BY d.{$dateSort} DESC LIMIT 0,{$dle_moonwalk_config['block']['block_news']}");
+	$getIds = $db->query("SELECT d.id
+      , d.season
+      , d.seria
+      , d.{$dateSort} 
+   FROM ( 
+          SELECT IF(m.newsId = @p_news_id, 0, 1) AS is_max
+               , m.id
+               , @p_news_id := m.newsId AS newsId
+               , m.season
+               , m.seria
+               , m.{$dateSort}
+            FROM ( SELECT @p_news_id := NULL ) r
+           CROSS
+            JOIN " . PREFIX . "_dle_moonwalk m
+           ORDER
+              BY m.newsId     DESC
+               , m.season      DESC
+               , m.seria       DESC
+               , m.{$dateSort}  DESC
+        ) d
+  WHERE d.is_max ORDER BY d.newsId");
+  
+	$idArray = [];
+	while ($rowIds = $db->get_row($getIds)) {
+		$idArray[] = $rowIds['id'];
+	}
+	$orderBlock = " AND d.id IN ('" . implode("','", $idArray) . "') ORDER BY {$dateSort} DESC, FIND_IN_SET (d.id, '". implode(',', $idArray) . "')";
+	$db->query("SELECT d.voice, d.season, d.seria, d.updateDate, d.updateMoonwalk, d.category as moonwalkCategory, d.quality, d.typeVideo, d.translatorId, p.title, p.id, p.date, p.category, p.xfields, p.short_story, p.alt_name FROM " . PREFIX . "_dle_moonwalk d LEFT JOIN " . PREFIX . "_post p ON(d.newsId=p.id) WHERE d.{$dateSort} >= DATE_SUB(CURRENT_DATE, INTERVAL {$dle_moonwalk_config['block']['block_date']} DAY) AND approve=1 {$findCat} {$findType} {$orderBlock} LIMIT 0,{$dle_moonwalk_config['block']['block_news']}");
 } else {
-	$db->query("SELECT d.voice, d.season, d.seria, d.updateDate, d.updateMoonwalk, d.category as moonwalkCategory, d.quality, d.typeVideo, d.translatorId, p.title, p.id, p.date, p.category, p.xfields, p.alt_name FROM " . PREFIX . "_dle_moonwalk d LEFT JOIN " . PREFIX . "_post p ON(d.newsId=p.id) WHERE d.{$dateSort} >= DATE_SUB(CURRENT_DATE, INTERVAL {$dle_moonwalk_config['block']['block_date']} DAY) AND approve=1 {$findCat} {$findType} ORDER BY d.{$dateSort} DESC LIMIT 0,{$dle_moonwalk_config['block']['block_news']}");
+	$db->query("SELECT d.voice, d.season, d.seria, d.updateDate, d.updateMoonwalk, d.category as moonwalkCategory, d.quality, d.typeVideo, d.translatorId, p.title, p.id, p.date, p.category, p.xfields, p.short_story, p.alt_name FROM " . PREFIX . "_dle_moonwalk d LEFT JOIN " . PREFIX . "_post p ON(d.newsId=p.id) WHERE d.{$dateSort} >= DATE_SUB(CURRENT_DATE, INTERVAL {$dle_moonwalk_config['block']['block_date']} DAY) AND approve=1 {$findCat} {$findType} ORDER BY d.{$dateSort} DESC LIMIT 0,{$dle_moonwalk_config['block']['block_news']}");
 }
 $blockContent = [];
 while ($row = $db->get_row()) {
@@ -114,7 +141,57 @@ foreach ($blockContent as $updateDate => $news) {
 		}
 		
 		$tplBlockContent->set('{full-link}', $full_link);
-		$tplBlockContent->set('{title}', stripslashes($data['title']));
+		
+		if (stripos($tpl->copy_template, '{image-') !== false) {
+			$images = [];
+			preg_match_all('/(img|src)=("|\')[^"\'>]+/i', $data['short_story'] . $data['xfields'], $media);
+			$data = preg_replace('/(img|src)("|\'|="|=\')(.*)/i', "$3", $media[0]);
+	
+			foreach ($data as $url) {
+				$info = pathinfo($url);
+				if (isset($info['extension'])) {
+					if ($info['filename'] == 'spoiler-plus' || $info['filename'] == 'spoiler-minus' || strpos($info['dirname'], 'engine/data/emoticons') !== false) {
+						continue;
+					}
+					
+					$info['extension'] = strtolower($info['extension']);
+					if (($info['extension'] == 'jpg') || ($info['extension'] == 'jpeg') || ($info['extension'] == 'gif') || ($info['extension'] == 'png')) { 	array_push($images, $url);
+					}
+				}
+			}
+	
+			if (count($images)) {
+				$i_count = 0;
+				foreach ($images as $url) {
+					$i_count++;
+					$tpl->copy_template = str_replace('{image-'.$i_count.'}', $url, $tpl->copy_template);
+					$tpl->copy_template = str_replace('[image-'.$i_count.']', '', $tpl->copy_template);
+					$tpl->copy_template = str_replace('[/image-'.$i_count.']', '', $tpl->copy_template);
+				}
+	
+			}
+	
+			$tpl->copy_template = preg_replace("#\[image-(.+?)\](.+?)\[/image-(.+?)\]#is", '', $tpl->copy_template);
+			$tpl->copy_template = preg_replace("#\\{image-(.+?)\\}#i", '{THEME}/dleimages/no_image.jpg', $tpl->copy_template);
+		}
+		
+		$data['title'] = stripslashes($data['title']);
+		$tplBlockContent->set('{title}', $data['title']);
+		if (preg_match("#\\{title limit=['\"](.+?)['\"]\\}#i", $tplBlockContent->copy_template, $matches)) {
+			$count = intval($matches[1]);
+			$data['title'] = strip_tags($data['title']);
+
+			if ($count && dle_strlen($data['title'], $config['charset']) > $count) {
+				$data['title'] = dle_substr($data['title'], 0, $count, $config['charset']);
+					
+				if (($temp_dmax = dle_strrpos($data['title'], ' ', $config['charset']))) {
+					$data['title'] = dle_substr($data['title'], 0, $temp_dmax, $config['charset']);
+				}
+			}
+
+			$tplBlockContent->set($matches[0], str_replace("&amp;amp;", "&amp;", htmlspecialchars($data['title'], ENT_QUOTES, $config['charset'])));
+		}
+		
 		if (!$data['category']) {
 			$my_cat = "---";
 			$my_cat_link = "---";

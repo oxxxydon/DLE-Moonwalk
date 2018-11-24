@@ -3,7 +3,7 @@
  * DLE Moonwalk
  *
  * @copyright 2018 LazyDev
- * @version   1.1.2
+ * @version   1.1.3
  * @link      https://lazydev.pro
  */
 
@@ -33,20 +33,20 @@ if (file_exists(ENGINE_DIR . '/classes/plugins.class.php')) {
 	dle_session();
 	require_once ENGINE_DIR . '/modules/sitelogin.php';
 }
-require_once ENGINE_DIR .'/dle_moonwalk/language/dle_moonwalk.lng';
+require_once ENGINE_DIR .'/dle_moonwalk/language/dle_moonwalk_admin_lang.lng';
 @header("Content-type: text/html; charset=" . $config['charset']);
 
 date_default_timezone_set($config['date_adjust']);
 $_TIME = time();
 
 if (!$is_logged || $member_id['user_group'] != 1) {
-	echo json_encode(['head' => $dle_moonwalk_lang['error'], 'text' => $dle_moonwalk_lang[94], 'icon' => 'error']);
+	echo json_encode(['head' => $dle_moonwalk_admin_lang['error'], 'text' => $dle_moonwalk_admin_lang[94], 'icon' => 'error']);
 	return;
 }
 
 $_POST['user_hash'] = trim($_POST['user_hash']);
 if ($_POST['user_hash'] == '' || $_POST['user_hash'] != $dle_login_hash) {
-	echo json_encode(['head' => $dle_moonwalk_lang['error'], 'text' => $dle_moonwalk_lang[94], 'icon' => 'error']);
+	echo json_encode(['head' => $dle_moonwalk_admin_lang['error'], 'text' => $dle_moonwalk_admin_lang[94], 'icon' => 'error']);
 	return;
 }
 
@@ -83,6 +83,6 @@ if ($action == 'options') {
 	fwrite($handler, var_export($new_array, true));
 	fwrite($handler, ";\n\n?>");
 	fclose($handler);
-	echo json_encode(['head' => $dle_moonwalk_lang['its_ok'], 'text' => $dle_moonwalk_lang['options_save'], 'icon' => 'success']);
+	echo json_encode(['head' => $dle_moonwalk_admin_lang['its_ok'], 'text' => $dle_moonwalk_admin_lang['options_save'], 'icon' => 'success']);
 }
 ?>
