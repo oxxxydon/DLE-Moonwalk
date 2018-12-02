@@ -142,7 +142,7 @@ foreach ($blockContent as $updateDate => $news) {
 		
 		$tplBlockContent->set('{full-link}', $full_link);
 		
-		if (stripos($tpl->copy_template, '{image-') !== false) {
+		if (stripos($tplBlockContent->copy_template, '{image-') !== false) {
 			$images = [];
 			preg_match_all('/(img|src)=("|\')[^"\'>]+/i', $data['short_story'] . $data['xfields'], $media);
 			$data = preg_replace('/(img|src)("|\'|="|=\')(.*)/i', "$3", $media[0]);
@@ -164,15 +164,15 @@ foreach ($blockContent as $updateDate => $news) {
 				$i_count = 0;
 				foreach ($images as $url) {
 					$i_count++;
-					$tpl->copy_template = str_replace('{image-'.$i_count.'}', $url, $tpl->copy_template);
-					$tpl->copy_template = str_replace('[image-'.$i_count.']', '', $tpl->copy_template);
-					$tpl->copy_template = str_replace('[/image-'.$i_count.']', '', $tpl->copy_template);
+					$tplBlockContent->copy_template = str_replace('{image-' . $i_count . '}', $url, $tplBlockContent->copy_template);
+					$tplBlockContent->copy_template = str_replace('[image-' . $i_count . ']', '', $tplBlockContent->copy_template);
+					$tplBlockContent->copy_template = str_replace('[/image-' . $i_count . ']', '', $tplBlockContent->copy_template);
 				}
 	
 			}
 	
-			$tpl->copy_template = preg_replace("#\[image-(.+?)\](.+?)\[/image-(.+?)\]#is", '', $tpl->copy_template);
-			$tpl->copy_template = preg_replace("#\\{image-(.+?)\\}#i", '{THEME}/dleimages/no_image.jpg', $tpl->copy_template);
+			$tplBlockContent->copy_template = preg_replace("#\[image-(.+?)\](.+?)\[/image-(.+?)\]#is", '', $tplBlockContent->copy_template);
+			$tplBlockContent->copy_template = preg_replace("#\\{image-(.+?)\\}#i", '{THEME}/dleimages/no_image.jpg', $tplBlockContent->copy_template);
 		}
 		
 		$data['title'] = stripslashes($data['title']);
@@ -282,5 +282,6 @@ foreach ($blockContent as $updateDate => $news) {
 	$tpl->compile('block_moonwalk');
 	$tplBlockContent->global_clear();
 }
+
 create_cache('news_moonwalk_block', $tpl->result['block_moonwalk'], $config['skin'] . $findCat . $findType, false);
 echo $tpl->result['block_moonwalk'];
