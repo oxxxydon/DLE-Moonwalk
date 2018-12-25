@@ -3,8 +3,8 @@
  * DLE Moonwalk
  *
  * @copyright 2018 LazyDev
- * @version   1.1.3
- * @link      https://lazydev.pro
+ * @version   2.0.0
+ * @link      https://lazydev.pro/
  */
 
 @error_reporting(E_ALL ^ E_WARNING ^ E_NOTICE);

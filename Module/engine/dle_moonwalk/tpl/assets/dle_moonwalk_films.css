@@ -1,0 +1,102 @@
+.blockVoice {
+    background-color: #151515;
+    padding-top: 2px;
+    padding-left: 10px;
+    padding-bottom: 2px;
+    text-align: left !important;
+}
+
+.voiceList {
+    overflow: hidden;
+	padding-left: 0px;
+}
+
+.voiceName {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    background-color: #2d2d2d;
+    color: #fff;
+    cursor: pointer;
+    float: left;
+    font-size: 14px;
+    margin-left: 0px;
+    margin-top: 3px;
+    overflow: hidden;
+    padding: 5px 0 5px 10px;
+    position: relative;
+    -ms-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 98%;
+}
+
+.activeVoiceName {
+    background: #5d5d5d !important;
+    cursor: default;
+}
+
+.advIcon {
+    -webkit-border-radius: 50%;
+    -khtml-border-radius: 50%;
+    -moz-border-radius: 50%;
+    -o-border-radius: 50%;
+    border-radius: 50%;
+    background: #bbb url(./icon-adv.png) no-repeat 50% 50%;
+    border: 1px solid #bbb;
+    cursor: help;
+    display: block;
+    font-size: 0;
+    height: 24px;
+    margin-top: -14px;
+    width: 24px;
+    line-height: 0;
+    position: absolute;
+    top: 50%;
+    right: 2px;
+}
+
+.advNotIcon {
+    -webkit-border-radius: 50%;
+    -khtml-border-radius: 50%;
+    -moz-border-radius: 50%;
+    -o-border-radius: 50%;
+    border-radius: 50%;
+    background: #bbb url(./icon-not-adv.png) no-repeat 50% 50%;
+    border: 1px solid #bbb;
+    cursor: help;
+    display: block;
+    font-size: 0;
+    height: 24px;
+    margin-top: -14px;
+    width: 24px;
+    line-height: 0;
+    position: absolute;
+    top: 50%;
+    right: 2px;
+}
+
+#playerFilmMoon {
+	background: #000;
+    padding-top: 10px;
+    position: relative;
+	text-align: center;
+}
+
+#loadPlayerMoon {
+    background-color: #000;
+    background-image: url(./ajax-loader-big-black.gif);
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+    display: none;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+}
+
+#loadBlock {
+	width: 100%;
+	height: 360px;
+}

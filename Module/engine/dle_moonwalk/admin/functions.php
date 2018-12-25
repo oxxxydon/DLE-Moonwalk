@@ -3,8 +3,8 @@
  * DLE Moonwalk
  *
  * @copyright 2018 LazyDev
- * @version   1.1.3
- * @link      https://lazydev.pro
+ * @version   2.0.0
+ * @link      https://lazydev.pro/
  */
  
 if (!defined('DATALIFEENGINE') || !defined('LOGGED_IN')) {
@@ -64,9 +64,10 @@ function makeLazyCheckBox($name, $selected, $disabled = false)
 	return "<label class=\"checkbox\"><input type=\"checkbox\" name=\"{$name}\" value=\"1\" {$selected} {$disabled}><span></span></label>";
 }
 
-function showLazySelect($name, $select, $placeholder = '')
+function showLazySelect($name, $select, $placeholder = '', $multiple = true)
 {
-	return "<select name=\"{$name}\" class=\"form-control custom-select\" data-placeholder=\"{$placeholder}\" multiple>" . $select . "</select>";
+    $multiple = $multiple === true ? 'multiple' : '';
+	return "<select name=\"{$name}\" class=\"form-control custom-select\" data-placeholder=\"{$placeholder}\" {$multiple}>" . $select . "</select>";
 }
 
 function lazySelect($data)
@@ -102,34 +103,73 @@ return <<<HTML
 HTML;
 }
 
-	function showTrInline($name, $description, $type, $data)
-	{
+function lazySelectDisable($data, $disable)
+{
+	$i = 0;
+	foreach ($data[1] as $key => $val) {
+		if ($data[2]) {
+			$output .= "<option value=\"{$key}\"";
+		} else {
+			$output .= "<option value=\"{$val}\"";
+		}
+		
+		if (is_array($data[3])) {
+			foreach ($data[3] as $element) {
+				if ($data[2] && $element == $key) {
+					$output .= ' selected';
+				} elseif (!$data[2] && $element == $val) {
+					$output .= ' selected';
+				}
+			}
+		} elseif ($data[2] && $data[3] == $key) {
+			$output .= ' selected';
+		} elseif (!$data[2] && $data[3] == $val) {
+			$output .= ' selected';
+		}
+		if (!$disable[$i]) {
+			$output .= ' disabled';
+		}
+		$output .= ">{$val}</option>\n";
+		$i++;
+	}
+	$input_elemet = $data[5] ? ' disabled' : '';
+	$input_elemet .= $data[4] ? ' multiple' : '';
+	$input_elemet .= $data[6] ? " data-placeholder=\"{$data[6]}\"" : '';
+return <<<HTML
+<select name="{$data[0]}" class="form-control custom-select" {$input_elemet}>
+	{$output}
+</select>
+HTML;
+}
+
+function showTrInline($name, $description, $type, $data)
+{
 echo <<<HTML
 <tr>
 	<td>
 		<label style="float:left;" class="form-label">{$name}</label>
 HTML;
-		switch ($type) {
-			case 'input':
-				echo showLazyInput($data);
-			break;
-			case 'textarea':
-				echo textareaLazyForm($data);
-			break;
-			default:
-				echo $data;
-			break;
-		}
+	switch ($type) {
+		case 'input':
+			echo showLazyInput($data);
+		break;
+		case 'textarea':
+			echo textareaLazyForm($data);
+		break;
+		default:
+			echo $data;
+		break;
+	}
 echo <<<HTML
 </tr>
 HTML;
-	}
+}
 	
-	function textareaLazyForm($data)
-	{
-		$input_elemet = $data[2] ? " placeholder=\"{$data[2]}\"" : '';
-		$input_elemet .= $data[3] ? ' disabled' : '';
+function textareaLazyForm($data)
+{
+	$input_elemet = $data[2] ? " placeholder=\"{$data[2]}\"" : '';
+	$input_elemet .= $data[3] ? ' disabled' : '';
 return <<<HTML
 	<textarea style="min-height:150px;max-height:150px;min-width:333px;max-width:100%;border: 1px solid #ddd;padding: 5px;" autocomplete="off" class="form-control" name="{$data[0]}"{$input_elemet}>{$data[1]}</textarea>
 HTML;
-	}
+}

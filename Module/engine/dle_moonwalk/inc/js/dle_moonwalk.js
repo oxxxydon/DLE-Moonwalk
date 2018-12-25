@@ -1,6 +1,6 @@
 $(function() {
-	$('body').on('click', '.DleMoonwalk-search-clear', function() {
-		$('.DleMoonwalk-search-clear').css('display', 'none');
+	$('body').on('click', '#DleMoonwalk-search-clear', function() {
+		$('#DleMoonwalk-search-clear').css('display', 'none');
 		$('#DleMoonwalk-search-results').hide();
 		$('.DleMoonwalk-search-tbody').html('');
 	});
@@ -39,11 +39,14 @@ function dleMoonwalkSetData(hash) {
 		
 		var type = $(this).data('type');
 		var token = $(this).data('token');
-		
+        var news_id = 0;
+		if ($('[name=id]').length > 0) {
+            news_id = $('[name=id]').val();
+        }
 		$.ajax({
 			method: 'POST',
 			url: '/engine/dle_moonwalk/inc/ajax/dle_moonwalk.php',
-			data: { type: type, token: token, user_hash: hash, action: 'setData' }
+			data: { type: type, token: token, user_hash: hash, action: 'setData', news_id: news_id }
 		}).done(function(msg) {
 			HideLoading();
 			try {
@@ -55,7 +58,6 @@ function dleMoonwalkSetData(hash) {
 					});
 				} else {
 					$.each(msg.api, function(key, value) {
-						console.log('key => ' + key + ' | val => ' + value);
 						if (msg.api[key] !== undefined) {
 							if (key == 'p.title' || key == 'p.short_story' || key == 'p.full_story') {
 								var idKey = key.replace('p.', '');
@@ -101,6 +103,28 @@ function dleMoonwalkSetData(hash) {
 							}
 						}
 					});
+                    
+                    if (msg.cat) {
+                        $.each(msg.cat, function(key, cat) {
+                            $('#category > option[value="'+cat+'"]').attr('selected', 'selected');
+                        });
+                    
+                        $('#category').trigger('chosen:updated');
+                    }
+                    
+                    if (msg.poster['field'] !== undefined) {
+                        var returnbox = msg.poster['returnbox'];
+                        var returnval = msg.poster['xfvalue'];
+
+                        returnbox = returnbox.replace(/&lt;/g, "<");
+                        returnbox = returnbox.replace(/&gt;/g, ">");
+                        returnbox = returnbox.replace(/&amp;/g, "&");
+
+                        $('#uploadedfile_' + msg.poster['field']).html( returnbox );
+                        $('#xf_' + msg.poster['field']).val(returnval);
+
+                        $('#xfupload_' + msg.poster['field'] + ' .qq-upload-button, #xfupload_' + msg.poster['field'] + ' .qq-upload-button input').attr('disabled', 'disabled');
+                    }
 				}
 			} catch (e) {
 				
@@ -109,11 +133,12 @@ function dleMoonwalkSetData(hash) {
 	});
 };
 
-var miniLang = {};
-miniLang.title = 'Пустой заголовок новости';
-miniLang.id_kinopoisk = 'Пустое поле ID Кинопоиск';
-miniLang.id_worldart = 'Пустое поле ID World-Art';
-miniLang.id_pornolab = 'Пустое поле ID Pornolab';
+var miniLang = {
+	title: 'Пустой заголовок новости',
+	id_kinopoisk: 'Пустое поле ID Кинопоиск',
+	id_worldart: 'Пустое поле ID World-Art',
+	id_pornolab: 'Пустое поле ID Pornolab',
+};
 
 function dleMoonwalkAlert(message, title) {
 
@@ -130,7 +155,7 @@ function dleMoonwalkAlert(message, title) {
 };
 
 function parseDleMoonwalk(hash) {
-	$('.DleMoonwalk-search-clear').css('display', 'none');
+	$('#DleMoonwalk-search-clear').css('display', 'none');
 	var fieldChoose = $('[name=optionChoose]').val();
 	var searchData = '';
 	if (fieldChoose == 'title') {
@@ -146,17 +171,12 @@ function parseDleMoonwalk(hash) {
 		});
 		return;
 	}
-	
-	var chooseDb = 'moonwalk';
-	if ($('[name=optionChooseDb]')) {
-		var chooseDb = $('[name=optionChooseDb]').val();
-	}
-	
+		
 	ShowLoading();
 	$.ajax({
 		method: 'POST',
 		url: '/engine/dle_moonwalk/inc/ajax/dle_moonwalk.php',
-		data: { fieldChoose: fieldChoose, chooseDb: chooseDb, searchData: searchData, user_hash: hash, action: 'searchAdmin' }
+		data: { fieldChoose: fieldChoose, searchData: searchData, user_hash: hash, action: 'searchAdmin' }
 	}).done(function(msg) {
 		HideLoading();
 		try {
@@ -174,10 +194,11 @@ function parseDleMoonwalk(hash) {
 				} else {
 					$('#DleMoonwalk-search-notfound').html('').hide();
 					$('#DleMoonwalk-search-results').show();
-					$('.DleMoonwalk-search-clear').css('display', 'inline-block');
+					$('#DleMoonwalk-search-clear').css('display', 'inline-block');
 					$('.DleMoonwalk-search-tbody').html(msg.content);
 					dleMoonwalkLoadPreviewPlayer();
 					dleMoonwalkSetData(hash);
+					$('[data-rel=alertAdv]').popover({container:'body'});
 				}
 			}
 		} catch (e) {

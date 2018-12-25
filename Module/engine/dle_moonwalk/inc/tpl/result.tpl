@@ -1,13 +1,13 @@
 <div class="DleMoonwalk-search-tr">
     <div class="DleMoonwalk-search-td DleMoonwalk-mobile">
-		<span style="[movie]color: #379EB6;[/movie][serial]color: #33A845;[/serial]">{type}</span>
+		<div style="[movie]color: #379EB6;[/movie][serial]color: #33A845;[/serial]display: flex;">{type} <i style="color: white;display: inline-flex;margin-left: 5px;margin-top: 5px;" class="fa fa-question-circle" data-rel="alertAdv" data-trigger="hover" data-placement="right" data-content="{category}"></i></div>
 	</div>
     <div class="DleMoonwalk-search-td">
 		<span style="color: #b396f2;">{year}</span>
 	</div>
     <div class="DleMoonwalk-search-td DleMoonwalk-nomobile">
 		{title}
-		[adv]<i class="DleMoonwalk-instream-ads DleMoonwalk-fas fa fa-volume-up" title="Содержит вшитую аудиорекламу"></i>[/adv]
+		[adv]<i class="DleMoonwalk-instream-ads DleMoonwalk-fas fa fa-volume-up"  data-rel="alertAdv" data-trigger="hover" data-placement="right" data-content="Содержит вшитую аудиорекламу"></i>[/adv]
 	</div>
     <div class="DleMoonwalk-search-td">
 		<span style="color: #F9C618;">{quality}</span>

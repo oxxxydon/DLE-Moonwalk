@@ -1,4 +1,4 @@
-#DleMoonwalk-search {
+.DleMoonwalk-search {
     font-family: PF Centro Sans Pro, sans-serif;
     font-size: 17px;
 }
@@ -155,9 +155,9 @@
 	background-color: #2b2e33;
 }
 
-#DleMoonwalk-search button.DleMoonwalk-search-preview,
-#DleMoonwalk-search button.DleMoonwalk-search-insert,
-#DleMoonwalk-search button.DleMoonwalk-set-data {
+.DleMoonwalk-search button.DleMoonwalk-search-preview,
+.DleMoonwalk-search button.DleMoonwalk-search-insert,
+.DleMoonwalk-search button.DleMoonwalk-set-data {
 	float: none;
 	display: inline-block;
 	margin-left: 3px;
@@ -167,20 +167,20 @@
 	height: auto;
 }
 
-#DleMoonwalk-search button.DleMoonwalk-search-preview i,
-#DleMoonwalk-search button.DleMoonwalk-search-insert i,
-#DleMoonwalk-search button.DleMoonwalk-set-data i {
+.DleMoonwalk-search button.DleMoonwalk-search-preview i,
+.DleMoonwalk-search button.DleMoonwalk-search-insert i,
+.DleMoonwalk-search button.DleMoonwalk-set-data i {
 	font-size: 13px;
 	min-width: auto!important;
 }
 
-#DleMoonwalk-search button.DleMoonwalk-search-preview:hover,
-#DleMoonwalk-search button.DleMoonwalk-search-insert:hover,
-#DleMoonwalk-search button.DleMoonwalk-set-data:hover {
+.DleMoonwalk-search button.DleMoonwalk-search-preview:hover,
+.DleMoonwalk-search button.DleMoonwalk-search-insert:hover,
+.DleMoonwalk-search button.DleMoonwalk-set-data:hover {
 	background-color: #3494ab;
 }
 
-#DleMoonwalk-search button.DleMoonwalk-search-preview {
+.DleMoonwalk-search button.DleMoonwalk-search-preview {
 	margin-left: 0 !important;
 }
 

@@ -1,12 +1,12 @@
-<?php
+﻿<?php
 /**
  * DLE Moonwalk
  *
  * @copyright 2018 LazyDev
- * @version   1.1.2
- * @link      https://lazydev.pro
+ * @version   2.0.0
+ * @link      https://lazydev.pro/
  */
- 
+
 @set_time_limit(0);
 
 @error_reporting(E_ALL ^ E_WARNING ^ E_DEPRECATED ^ E_NOTICE);
@@ -55,11 +55,19 @@ if ($idKinopoisk || $idWorldArt) {
 	}
 	
 	dleMoonwalk::realize()->config($config, $dle_moonwalk_config, $dle_moonwalk_admin_lang);
-	$dbNews = $db->query("SELECT id, xfields FROM " . PREFIX . "_post WHERE approve='1' AND date<'" . date ("Y-m-d H:i:s", time()) . "' {$where}");
+	$dbNews = $db->query("SELECT id, xfields, category FROM " . PREFIX . "_post WHERE approve='1' AND date<'" . date ("Y-m-d H:i:s", time()) . "' {$where}");
 	$i = 0;
 	while ($row = $db->get_row($dbNews)) {
 		$xfields = xfieldsdataload($row['xfields']);
-		
+        $updateCategory = '';
+		if ($dle_moonwalk_config['main']['delete_category']) {
+            $category = explode(',', $row['category']);
+            $category = array_diff($category, $dle_moonwalk_config['main']['delete_category']);
+            if ($category) {
+                $updateCategory = ", category='" . implode(',', $category) . "'";
+            }
+        }
+        
 		if (!$xfields[$idKinopoisk] && !$xfields[$idWorldArt]) {
 			$i++;
 			continue;
@@ -73,7 +81,7 @@ if ($idKinopoisk || $idWorldArt) {
 			$searchData = $xfields[$idWorldArt];
 		}
 		
-		$json = dleMoonwalk::parseCron($fieldChoose, 'moonwalk', $searchData);
+		$json = dleMoonwalk::parseCron($fieldChoose, $searchData);
 		$jsonArray = json_decode($json, true);
 		
 		if ($jsonArray['error']) {
@@ -91,9 +99,8 @@ if ($idKinopoisk || $idWorldArt) {
 		
 		if ($jsonArray[0]['type'] == 'movie') {
 			$getMovie = $db->super_query("SELECT id, voice, quality FROM " . PREFIX . "_dle_moonwalk WHERE newsId='{$row['id']}'");
-			$stopQuality = false;
-			$stopBadQuality = false;
-			$updateTime = false;
+			$stopQuality = $updateTime = $stopBadQuality = false;
+			$voiceArray = [];
 			$qualitySiteUpdate = '';
 			
 			if (!$dle_moonwalk_config['movie']['quality_field'] || $dle_moonwalk_config['movie']['quality_field'] == '-') {
@@ -107,9 +114,11 @@ if ($idKinopoisk || $idWorldArt) {
 					}
 				}
 				
-				if  ($category == 1 && !$value['translator']) {
+				if ($category == 1 && !$value['translator']) {
 					$value['translator'] = $dle_moonwalk_admin_lang[111];
 				}
+				
+				$voiceArray[$value['translator']] = $value['translator'];
 				
 				$qualityMoonwalk = $value['camrip'] ? 'CAMRip' : 'HDRip';
 				if ($value['source_type']) {
@@ -119,37 +128,35 @@ if ($idKinopoisk || $idWorldArt) {
 				if ($getMovie['quality'] && $getMovie['quality'] != $qualityMoonwalk && !isset($goodQualityArray[$getMovie['quality']])) {
 					if (!isset($badQualityArray[$qualityMoonwalk])) {
 						$qualitySiteUpdate = $qualityMoonwalk;
-						$getMovie['voice'] = $value['translator'];
-						$getMovie['translatorId'] = $value['translator_id'];
-						$getMovie['video'] = $value['iframe_url'];
-						$getMovie['updateMoonwalk'] = $value['added_at'];
+						$filmData = ['voice' => $value['translator'], 'translatorId' => $value['translator_id'], 'video' => $value['iframe_url'], 'updateMoonwalk' => $value['added_at'], 'updated_at' => $value['material_data']['updated_at']];
 						$updateTime = true;
 					}
 				} else if (!$getMovie['quality']) {
 					if (isset($goodQualityArray[$qualityMoonwalk])) {
 						$qualitySiteUpdate = $qualityMoonwalk;
-						$getMovie['voice'] = $value['translator'];
-						$getMovie['translatorId'] = $value['translator_id'];
-						$getMovie['video'] = $value['iframe_url'];
-						$getMovie['updateMoonwalk'] = $value['added_at'];
-						$stopQuality = true;
+						$filmData = ['voice' => $value['translator'], 'translatorId' => $value['translator_id'], 'video' => $value['iframe_url'], 'updateMoonwalk' => $value['added_at'], 'updated_at' => $value['material_data']['updated_at']];
+						$stopBadQuality = $stopQuality = true;
 					} elseif (isset($normalQualityArray[$qualityMoonwalk]) && !$stopQuality) {
 						$qualitySiteUpdate = $qualityMoonwalk;
-						$getMovie['voice'] = $value['translator'];
-						$getMovie['translatorId'] = $value['translator_id'];
-						$getMovie['video'] = $value['iframe_url'];
-						$getMovie['updateMoonwalk'] = $value['added_at'];
+						$filmData = ['voice' => $value['translator'], 'translatorId' => $value['translator_id'], 'video' => $value['iframe_url'], 'updateMoonwalk' => $value['added_at'], 'updated_at' => $value['material_data']['updated_at']];
 						$stopBadQuality = true;
 					} elseif(!$stopBadQuality && !$stopQuality) {
 						$qualitySiteUpdate = $qualityMoonwalk;
-						$getMovie['voice'] = $value['translator'];
-						$getMovie['translatorId'] = $value['translator_id'];
-						$getMovie['video'] = $value['iframe_url'];
-						$getMovie['updateMoonwalk'] = $value['added_at'];
+						$filmData = ['voice' => $value['translator'], 'translatorId' => $value['translator_id'], 'video' => $value['iframe_url'], 'updateMoonwalk' => $value['added_at'], 'updated_at' => $value['material_data']['updated_at']];
 					}
 				}
 			}
 			
+			if ($dle_moonwalk_config['movie']['voice_field'] && $voiceArray) {
+				if (!$dle_moonwalk_config['movie']['actual_voice']) {
+					$xfields[$dle_moonwalk_config['movie']['voice_field']] = implode(', ', $voiceArray);
+				} else {
+					$xfields[$dle_moonwalk_config['movie']['voice_field']] = $filmData['voice'];
+				}
+				unset($voiceArray);
+			}
+			
+			$getMovie = array_merge($getMovie, $filmData);
 			if ($dle_moonwalk_config['movie']['video_field']) {
 				if ($dle_moonwalk_config['main']['ssl']) {
 					$getMovie['video'] = preg_replace("#http(s)?://[^/]+/#iu", 'https://streamguard.cc/', $getMovie['video']);
@@ -184,11 +191,19 @@ if ($idKinopoisk || $idWorldArt) {
 			$filecontents = count($filecontents) ? $db->safesql(implode('||', $filecontents)) : '';
 
 			$date = '';
-			if ($updateTime) {
+			if ($updateTime && $dle_moonwalk_config['main']['update_date']) {
 				$date = ", date='" . date('Y-m-d H:i:s', time()) . "'";
+				if ($dle_moonwalk_config['main']['update_news_moonwalk']) {
+					if ($getMovie['added_at']) {
+						$date = ", date='" . $getMovie['added_at'] . "'";
+					} elseif ($getMovie['updated_at']) {
+						$date = ", date='" . $getMovie['updated_at'] . "'";
+					}
+				}
 			}
-			$db->query("UPDATE " . PREFIX . "_post SET xfields='{$filecontents}'{$date} WHERE id='{$row['id']}'");
+			$db->query("UPDATE " . PREFIX . "_post SET xfields='{$filecontents}'{$date}{$updateCategory} WHERE id='{$row['id']}'");
 			$updateDate = date('Y-m-d H:i:s', time());
+			
 			if ($getMovie['id'] && !$dle_moonwalk_config['block']['all_data']) {
 				$db->query("UPDATE " . PREFIX . "_dle_moonwalk SET voice='{$getMovie['voice']}', translatorId='{$getMovie['translatorId']}', updateDate='{$updateDate}', updateMoonwalk='{$getMovie['updateMoonwalk']}', quality='{$qualitySiteUpdate}' WHERE id='{$getMovie['id']}'");
 			} else {
@@ -196,10 +211,7 @@ if ($idKinopoisk || $idWorldArt) {
 			}
 		}
 		else {
-			$translatorSerial = [];
-			$maxSeasonArray = [];
-			$maxSeriaArray = [];
-			
+			$translatorSerial = $maxSeasonArray = $maxSeriaArray = $voiceArray = [];
 			$updateNews = false;
 			if (!$dle_moonwalk_config['serial']['update_all_voice']) {
 				$getMax = $db->super_query("SELECT MAX(season) as maxSeason, MAX(seria) as maxSeria FROM " . PREFIX . "_dle_moonwalk WHERE newsId='{$row['id']}'");
@@ -211,7 +223,16 @@ if ($idKinopoisk || $idWorldArt) {
 						continue;
 					}
 				}
+				
 				$updateDate = date('Y-m-d H:i:s', time());
+				if ($dle_moonwalk_config['block']['moonwalk_block_date']) {
+					if ($value['last_episode_time']) {
+						$updateDate = $value['last_episode_time'];
+					} elseif ($value['material_data']['updated_at']) {
+						$updateDate = $value['material_data']['updated_at'];
+					}
+				}
+				
 				$voiceId = $db->safesql($value['translator_id']);
 				$getData = $db->super_query("SELECT * FROM " . PREFIX . "_dle_moonwalk WHERE newsId='{$row['id']}' AND translatorId='{$voiceId}' ORDER BY id DESC LIMIT 1");
 				
@@ -249,14 +270,14 @@ if ($idKinopoisk || $idWorldArt) {
 								}
 							}
 							$maxSeriaArray[$value['translator_id']] = $getSeason['episodes_count'];
-							$translatorSerial[$value['translator_id']] = ['get' => $getData['newsId'], 'newsId' => $row['id'], 'quality' => $qualityMoonwalk, 'updateDate' => $updateDate, 'season' => $getSeason[0]['season_number'], 'seria' => $getSeason[0]['episodes_count'], 'translator' => $value['translator'], 'translatorId' => $value['translator_id']];
+							$translatorSerial[$value['translator_id']] = ['get' => $getData['newsId'], 'newsId' => $row['id'], 'quality' => $qualityMoonwalk, 'season' => $getSeason[0]['season_number'], 'seria' => $getSeason[0]['episodes_count'], 'translator' => $value['translator'], 'translatorId' => $value['translator_id'], 'updateMoonwalk' => $value['last_episode_time']];
 						}
+						$voiceArray[] = $value['translator'];
 					}
 				} else {
 					$getSeason = end($value['season_episodes_count']);
-					
 					if ($getSeason['season_number'] > $getData['season'] || $getSeason['season_number'] == $getData['season'] && $getSeason['episodes_count'] > $getData['seria'] || !$getData['season'] || !$getData['seria']) {
-						$translatorSerial[$value['translator_id']] = ['get' => $getData['newsId'], 'newsId' => $row['id'], 'quality' => $qualityMoonwalk, 'updateDate' => $updateDate, 'season' => $getSeason['season_number'], 'seria' => $getSeason['episodes_count'], 'translator' => $value['translator'], 'translatorId' => $value['translator_id'], 'getSeason' => $getData['season'], 'getSeria' => $getData['seria'], 'updateMoonwalk' => $value['last_episode_time']];
+						$translatorSerial[$value['translator_id']] = ['get' => $getData['newsId'], 'newsId' => $row['id'], 'quality' => $qualityMoonwalk, 'season' => $getSeason['season_number'], 'seria' => $getSeason['episodes_count'], 'translator' => $value['translator'], 'translatorId' => $value['translator_id'], 'getSeason' => $getData['season'], 'getSeria' => $getData['seria'], 'updateMoonwalk' => $value['last_episode_time']];
 						$maxSeriaArray[$getSeason['season_number']][$value['translator_id']] = $getSeason['episodes_count'];
 					}
 					$maxSeasonArray[] = $getSeason['season_number'];
@@ -272,11 +293,12 @@ if ($idKinopoisk || $idWorldArt) {
 				$dataForPost = $translatorTempSerial[$maxKey];
 				
 				foreach ($translatorTempSerial as $serialData) {
+					$voiceArray[] = $serialData['translator'];
 					if ($serialData['get'] && !$dle_moonwalk_config['block']['all_data']) {						
-						$db->query("UPDATE " . PREFIX . "_dle_moonwalk SET season='{$serialData['season']}', seria='{$serialData['seria']}', quality='{$serialData['quality']}', updateDate='{$serialData['updateDate']}', updateMoonwalk='{$serialData['updateMoonwalk']}' WHERE translatorId='{$serialData['translatorId']}' AND newsId='{$row['id']}'");
+						$db->query("UPDATE " . PREFIX . "_dle_moonwalk SET season='{$serialData['season']}', seria='{$serialData['seria']}', quality='{$serialData['quality']}', updateDate='{$updateDate}', updateMoonwalk='{$serialData['updateMoonwalk']}' WHERE translatorId='{$serialData['translatorId']}' AND newsId='{$row['id']}'");
 						$updateNews = true;
 					} else {
-						$db->query("INSERT INTO " . PREFIX . "_dle_moonwalk (newsId, voice, season, seria, updateDate, category, quality, typeVideo, translatorId, updateMoonwalk) VALUES ('{$serialData['newsId']}', '{$serialData['translator']}', '{$serialData['season']}', '{$serialData['seria']}', '{$serialData['updateDate']}', '{$category}', '{$serialData['quality']}', '1', '{$serialData['translatorId']}', '{$serialData['updateMoonwalk']}');");
+						$db->query("INSERT INTO " . PREFIX . "_dle_moonwalk (newsId, voice, season, seria, updateDate, category, quality, typeVideo, translatorId, updateMoonwalk) VALUES ('{$serialData['newsId']}', '{$serialData['translator']}', '{$serialData['season']}', '{$serialData['seria']}', '{$updateDate}', '{$category}', '{$serialData['quality']}', '1', '{$serialData['translatorId']}', '{$serialData['updateMoonwalk']}');");
 						if ($serialData['seria'] == 1 || $dle_moonwalk_config['block']['all_data'] && ($dle_moonwalk_config['serial']['update_all_voice'] || ($serialData['get'] && ($serialData['season'] > $serialData['getSeason'] || $serialData['season'] == $serialData['getSeason'] && $serialData['seria'] > $serialData['getSeria'])))) {
 							$updateNews = true;
 						}
@@ -300,7 +322,7 @@ if ($idKinopoisk || $idWorldArt) {
 					$updateNews = false;
 				}
 			}
-			
+
 			if ($updateNews) {
 				if ($dle_moonwalk_config['serial']['season_xfield']) {
 					$xfields[$dle_moonwalk_config['serial']['season_xfield']] = dleMoonwalk::switchType($dataForPost['season'], $dle_moonwalk_config['serial']['season_format'], 'season');
@@ -310,8 +332,13 @@ if ($idKinopoisk || $idWorldArt) {
 					$xfields[$dle_moonwalk_config['serial']['seria_xfield']] = dleMoonwalk::switchType($dataForPost['seria'], $dle_moonwalk_config['serial']['seria_format'], 'seria');
 				}
 				
+				if ($voiceArray) {
+					$xfields[$dle_moonwalk_config['serial']['voice_xfield']] = implode(', ', $voiceArray);
+				}
+				
 				$metaTitle = '';
 				if ($dle_moonwalk_config['serial']['change_meta']) {
+					
 					$tagKeys = ['title_ru', 'title_en', 'translator', 'year'];
 					$metaTitle = $dle_moonwalk_config['serial']['meta_title'];
 					foreach ($tagKeys as $tagKey) {
@@ -372,9 +399,16 @@ if ($idKinopoisk || $idWorldArt) {
 					$filecontents[] = $xfielddataname . '|' . $xfielddatavalue;
 				}
 
-				$filecontents = count($filecontents) ? $db->safesql(implode('||', $filecontents)) : '';				
-				$date = ", date='" . date('Y-m-d H:i:s', time()) . "'";
-				$db->query("UPDATE " . PREFIX . "_post SET xfields='{$filecontents}'{$metaTitle}{$date} WHERE id='{$row['id']}'");
+				$filecontents = count($filecontents) ? $db->safesql(implode('||', $filecontents)) : '';
+				if ($dle_moonwalk_config['main']['update_date']) {
+					$date = ", date='" . date('Y-m-d H:i:s', time()) . "'";
+					if ($dle_moonwalk_config['main']['update_news_moonwalk']) {
+						if ($dataForPost['updateMoonwalk']) {
+							$date = ", date='" . $dataForPost['updateMoonwalk'] . "'";
+						}
+					}
+				}
+				$db->query("UPDATE " . PREFIX . "_post SET xfields='{$filecontents}'{$metaTitle}{$date}{$updateCategory} WHERE id='{$row['id']}'");
 			}
 		}
 		
@@ -386,10 +420,6 @@ if ($idKinopoisk || $idWorldArt) {
 		} else {
 			$i++;
 		}
-	}
-	
-	if ($dle_moonwalk_config['block']['all_data']) {
-		$db->query("DELETE FROM " . PREFIX . "_dle_moonwalk WHERE updateDate < DATE_SUB(CURRENT_DATE, INTERVAL {$dle_moonwalk_config['block']['block_date']} DAY)");
 	}
 	
 	clear_cache(['news']);
