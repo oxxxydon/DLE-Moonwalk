@@ -145,9 +145,9 @@ foreach ($blockContent as $updateDate => $news) {
 		if (stripos($tplBlockContent->copy_template, '{image-') !== false) {
 			$images = [];
 			preg_match_all('/(img|src)=("|\')[^"\'>]+/i', $data['short_story'] . $data['xfields'], $media);
-			$data = preg_replace('/(img|src)("|\'|="|=\')(.*)/i', "$3", $media[0]);
+			$dataImageTag = preg_replace('/(img|src)("|\'|="|=\')(.*)/i', "$3", $media[0]);
 	
-			foreach ($data as $url) {
+			foreach ($dataImageTag as $url) {
 				$info = pathinfo($url);
 				if (isset($info['extension'])) {
 					if ($info['filename'] == 'spoiler-plus' || $info['filename'] == 'spoiler-minus' || strpos($info['dirname'], 'engine/data/emoticons') !== false) {
