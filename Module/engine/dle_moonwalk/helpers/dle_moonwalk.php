@@ -364,17 +364,17 @@ class dleMoonwalk
                 }
             }
             
-            if (strpos($tempData, '{kinopoisk_rating-') !== false) {
+            if (strpos($tempData, '{kinopoisk_rating-') !== false && $json['kinopoisk_rating'] > 0) {
                 preg_match("#\{kinopoisk_rating-(\d+)\}#is", $tempData, $matches);
                 if ($matches[1]) {
-                    $tempData = str_replace('{kinopoisk_rating-' . $matches[1] . '}', number_format($json['kinopoisk_rating'], intval($matches[1]), '.', ''), $tempData);
+                    $tempData = str_replace('{kinopoisk_rating-' . $matches[1] . '}', number_format((float)$json['kinopoisk_rating'], intval($matches[1]), '.', ''), $tempData);
                 }
             }
             
-            if (strpos($tempData, '{imdb_rating-') !== false) {
+            if (strpos($tempData, '{imdb_rating-') !== false && $json['imdb_rating'] > 0) {
                 preg_match("#\{imdb_rating-(\d+)\}#is", $tempData, $matches);
                 if ($matches[1]) {
-                    $tempData = str_replace('{imdb_rating-' . $matches[1] . '}', number_format($json['imdb_rating'], intval($matches[1]), '.', ''), $tempData);
+                    $tempData = str_replace('{imdb_rating-' . $matches[1] . '}', number_format((float)$json['imdb_rating'], intval($matches[1]), '.', ''), $tempData);
                 }
             }
             
