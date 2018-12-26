@@ -104,7 +104,7 @@ var configField = {}; {$configField}
 <script type="text/javascript" src="/engine/dle_moonwalk/inc/js/dle_moonwalk.js"></script>
 <script>
 $(function() {
-    var s = $('.form-group')[0];
+    var s = $('.form-group')[1];
     $(s).after($("$showSearch"));
     $('.uniform').selectpicker();
 });
