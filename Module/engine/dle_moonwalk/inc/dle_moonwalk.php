@@ -4,7 +4,7 @@
  *
  * @copyright 2018 LazyDev
  * @version   2.0.0
- * @link      https://lazydev.pro/
+ * @link      https://lazydev.pro
  */
  
 if (!defined('DATALIFEENGINE') || !defined('LOGGED_IN')) {
@@ -35,14 +35,8 @@ if ($dle_moonwalk_config['main']['api_token'] != '') {
 		}
 		$optionChoose .= "<option value=\"{$key}\"{$selectField}>{$val}</option>";
 	}
-	
-echo <<<HTML
-<link type="text/css" href="/engine/dle_moonwalk/inc/css/dle_moonwalk.css" rel="stylesheet">
-<script>
-var configField = {}; {$configField}
-</script>
-<script type="text/javascript" src="/engine/dle_moonwalk/inc/js/modal.min.js"></script>
-<script type="text/javascript" src="/engine/dle_moonwalk/inc/js/dle_moonwalk.js"></script>
+
+$showSearch = <<<HTML
 <div class="form-group">
 	<label class="control-label col-sm-2">{$dle_moonwalk_admin_lang['name']}:</label>
 	<div class="col-sm-10">
@@ -95,5 +89,25 @@ var configField = {}; {$configField}
 		</div>
 	</div>
 </div>
+HTML;
+
+$showSearch = str_replace(PHP_EOL, '', $showSearch);
+$showSearch = preg_replace('/\s+/', ' ', $showSearch);
+$showSearch = addslashes($showSearch);
+
+echo <<<HTML
+<link type="text/css" href="/engine/dle_moonwalk/inc/css/dle_moonwalk.css" rel="stylesheet">
+<script>
+var configField = {}; {$configField}
+</script>
+<script type="text/javascript" src="/engine/dle_moonwalk/inc/js/modal.min.js"></script>
+<script type="text/javascript" src="/engine/dle_moonwalk/inc/js/dle_moonwalk.js"></script>
+<script>
+$(function() {
+    var s = $('.form-group')[0];
+    $(s).after($("$showSearch"));
+    $('.uniform').selectpicker();
+});
+</script>
 HTML;
 }
