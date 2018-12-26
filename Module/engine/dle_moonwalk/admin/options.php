@@ -283,7 +283,7 @@ echo <<<HTML
 						</tr>
 						<tr>
 							<td><b>[tag-seria-format-4]{seria-format-4}[/tag-seria-format-4]</b></td>
-							<td>{$dle_moonwalk_admin_lang[43]}</td>
+							<td>{$dle_moonwalk_admin_lang[117]}</td>
 						</tr>
 						<tr>
 							<td><b>[tag-directors]{directors}[/tag-directors]</b></td>
