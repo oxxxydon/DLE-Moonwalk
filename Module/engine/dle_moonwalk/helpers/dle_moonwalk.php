@@ -138,7 +138,7 @@ class dleMoonwalk
 					$temp = preg_replace("#\[serial\](.*?)\[/serial\]#is", '', $temp);
 				}
 				$temp = str_replace('{quality}', $quality, $temp);
-				$temp = str_replace('{voice}', $voice, $temp);
+				$temp = str_replace('{voice}', trim($voice), $temp);
 				$temp = str_replace('{url}', $array['iframe_url'], $temp);
 				$temp = str_replace('{type-video}', $array['type'] == 'movie' ? 'movie' : 'serial', $temp);
 				$temp = str_replace('{token}', $array['token'], $temp);
@@ -191,7 +191,7 @@ class dleMoonwalk
             if ($dataVoice['translator'] == 'n/a' && $dataVoice['category'] == 'russian') {
                 $dataVoice['translator'] = self::$moonwalk_lang[111];
             }
-            $allVoiceArray[] = $dataVoice['translator'];
+            $allVoiceArray[] = trim($dataVoice['translator']);
         }
         
         unset($allVoice);
@@ -281,7 +281,7 @@ class dleMoonwalk
 					}
 					
 					if ($json[$key]) {
-						$json[$key] = stripslashes($json[$key]);
+						$json[$key] = trim(stripslashes($json[$key]));
 					} elseif ($json['material_data'][$key] && is_array($json['material_data'][$key])) {
 						$json[$key] = stripslashes(implode(', ', $json['material_data'][$key]));
 					} elseif ($json['material_data'][$key]) {
