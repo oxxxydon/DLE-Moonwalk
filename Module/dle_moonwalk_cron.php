@@ -155,21 +155,20 @@ if ($idKinopoisk || $idWorldArt) {
 				}
 				unset($voiceArray);
 			}
-			
+			if ($filmData) {
 			$getMovie = array_merge($getMovie, $filmData);
-			if ($dle_moonwalk_config['movie']['video_field']) {
-				if ($dle_moonwalk_config['main']['ssl']) {
-					$getMovie['video'] = preg_replace("#http(s)?://[^/]+/#iu", 'https://streamguard.cc/', $getMovie['video']);
-				} elseif ($dle_moonwalk_config['main']['domain'] != '') {
-					$getMovie['video'] = preg_replace("#http(s)?://[^/]+/#iu", 'http://' . $dle_moonwalk_config['main']['domain'] . '/', $getMovie['video']);
-				}
-				$xfields[$dle_moonwalk_config['movie']['video_field']] = $getMovie['video'];
-			}
-			
+                if ($dle_moonwalk_config['movie']['video_field']) {
+                    if ($dle_moonwalk_config['main']['ssl']) {
+                        $getMovie['video'] = preg_replace("#http(s)?://[^/]+/#iu", 'https://streamguard.cc/', $getMovie['video']);
+                    } elseif ($dle_moonwalk_config['main']['domain'] != '') {
+                        $getMovie['video'] = preg_replace("#http(s)?://[^/]+/#iu", 'http://' . $dle_moonwalk_config['main']['domain'] . '/', $getMovie['video']);
+                    }
+                    $xfields[$dle_moonwalk_config['movie']['video_field']] = $getMovie['video'];
+                }
+            }
+            
 			if ($qualitySiteUpdate && $getMovie['quality'] != $qualitySiteUpdate) {
-				if (!$xfields[$dle_moonwalk_config['movie']['quality_field']]) {
-					$updateTime = true;
-				}
+				$updateTime = true;
 				$xfields[$dle_moonwalk_config['movie']['quality_field']] = $qualitySiteUpdate;
 			} else {
 				continue;
