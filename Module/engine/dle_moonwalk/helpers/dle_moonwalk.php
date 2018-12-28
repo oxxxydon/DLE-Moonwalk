@@ -137,6 +137,13 @@ class dleMoonwalk
 					$temp = preg_replace("#\[movie\](.*?)\[/movie\]#is", '\\1', $temp);
 					$temp = preg_replace("#\[serial\](.*?)\[/serial\]#is", '', $temp);
 				}
+                
+                if (self::$moonwalk_config['main']['ssl']) {
+                    $array['iframe_url'] = preg_replace("#http(s)?://[^/]+/#iu", 'https://streamguard.cc/', $array['iframe_url']);
+                } elseif (self::$moonwalk_config['main']['domain'] != '') {
+                    $array['iframe_url'] = preg_replace("#http(s)?://[^/]+/#iu", 'http://' . self::$moonwalk_config['main']['domain'] . '/', $array['iframe_url']);
+                }
+                
 				$temp = str_replace('{quality}', $quality, $temp);
 				$temp = str_replace('{voice}', trim($voice), $temp);
 				$temp = str_replace('{url}', $array['iframe_url'], $temp);
