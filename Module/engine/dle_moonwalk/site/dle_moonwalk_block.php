@@ -88,7 +88,7 @@ if ($dle_moonwalk_config['block']['one_voice']) {
 }
 $blockContent = [];
 while ($row = $db->get_row()) {
-	$date = date('Y-m-d', strtotime($row['updateDate']));
+	$date = date('Y-m-d', strtotime($row[$dateSort]));
 	$blockContent[$date][] = $row;
 }
 
