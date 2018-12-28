@@ -608,7 +608,7 @@ echo <<<HTML
 		});
 	});
 </script>
-<div class="panel">
+<div class="panel" style="margin-top: 20px;">
 	<div class="panel-content">
 		<div class="panel-body">
 			© 2018 <a href="https://lazydev.pro/" target="_blank">LazyDev.pro</a> &copy; {$year} | <a href="https://opensource.org/licenses/MIT" target="_blank">MIT License</a>.
