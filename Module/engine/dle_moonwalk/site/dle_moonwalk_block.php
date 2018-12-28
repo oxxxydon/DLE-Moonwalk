@@ -54,6 +54,9 @@ if ($cache) {
 	return;
 }
 
+$dle_moonwalk_config['block']['block_date'] = $dle_moonwalk_config['block']['block_date'] ?: 3;
+$dle_moonwalk_config['block']['block_news'] = $dle_moonwalk_config['block']['block_news'] ?: 20;
+
 if ($dle_moonwalk_config['block']['one_voice']) {
 	$getIds = $db->query("SELECT d.id
       , d.season
@@ -82,9 +85,9 @@ if ($dle_moonwalk_config['block']['one_voice']) {
 		$idArray[] = $rowIds['id'];
 	}
 	$orderBlock = " AND d.id IN ('" . implode("','", $idArray) . "') ORDER BY {$dateSort} DESC, FIND_IN_SET (d.id, '". implode(',', $idArray) . "')";
-	$db->query("SELECT d.voice, d.season, d.seria, d.updateDate, d.updateMoonwalk, d.category as moonwalkCategory, d.quality, d.typeVideo, d.translatorId, p.title, p.id, p.date, p.category, p.xfields, p.short_story, p.alt_name FROM " . PREFIX . "_dle_moonwalk d LEFT JOIN " . PREFIX . "_post p ON(d.newsId=p.id) WHERE d.{$dateSort} >= DATE_SUB(CURRENT_DATE, INTERVAL {$dle_moonwalk_config['block']['block_date']} DAY) AND approve=1 {$findCat} {$findType} {$orderBlock} LIMIT 0,{$dle_moonwalk_config['block']['block_news']}");
+	$db->query("SELECT d.voice, d.season, d.seria, d.updateDate, d.updateMoonwalk, d.category as moonwalkCategory, d.quality, d.typeVideo, d.translatorId, p.title, p.id, p.date, p.category, p.xfields, p.short_story, p.alt_name FROM " . PREFIX . "_dle_moonwalk d LEFT JOIN " . PREFIX . "_post p ON(d.newsId=p.id) WHERE DATE(d.{$dateSort}) <= CURRENT_DATE AND DATE(d.{$dateSort}) >= DATE_SUB(CURRENT_DATE, INTERVAL {$dle_moonwalk_config['block']['block_date']} DAY) AND approve=1 {$findCat} {$findType} {$orderBlock} LIMIT 0,{$dle_moonwalk_config['block']['block_news']}");
 } else {
-	$db->query("SELECT d.voice, d.season, d.seria, d.updateDate, d.updateMoonwalk, d.category as moonwalkCategory, d.quality, d.typeVideo, d.translatorId, p.title, p.id, p.date, p.category, p.xfields, p.short_story, p.alt_name FROM " . PREFIX . "_dle_moonwalk d LEFT JOIN " . PREFIX . "_post p ON(d.newsId=p.id) WHERE d.{$dateSort} >= DATE_SUB(CURRENT_DATE, INTERVAL {$dle_moonwalk_config['block']['block_date']} DAY) AND approve=1 {$findCat} {$findType} ORDER BY d.{$dateSort} DESC LIMIT 0,{$dle_moonwalk_config['block']['block_news']}");
+	$db->query("SELECT d.voice, d.season, d.seria, d.updateDate, d.updateMoonwalk, d.category as moonwalkCategory, d.quality, d.typeVideo, d.translatorId, p.title, p.id, p.date, p.category, p.xfields, p.short_story, p.alt_name FROM " . PREFIX . "_dle_moonwalk d LEFT JOIN " . PREFIX . "_post p ON(d.newsId=p.id) WHERE DATE(d.{$dateSort}) <= CURRENT_DATE AND DATE(d.{$dateSort}) >= DATE_SUB(CURRENT_DATE, INTERVAL {$dle_moonwalk_config['block']['block_date']} DAY) AND approve=1 {$findCat} {$findType} ORDER BY d.{$dateSort} DESC LIMIT 0,{$dle_moonwalk_config['block']['block_news']}");
 }
 $blockContent = [];
 while ($row = $db->get_row()) {
