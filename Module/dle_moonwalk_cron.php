@@ -55,7 +55,7 @@ if ($idKinopoisk || $idWorldArt) {
 	}
 	
 	dleMoonwalk::realize()->config($config, $dle_moonwalk_config, $dle_moonwalk_admin_lang);
-	$dbNews = $db->query("SELECT id, xfields, category FROM " . PREFIX . "_post WHERE approve='1' AND id='1211' AND date<'" . date ("Y-m-d H:i:s", time()) . "' {$where}");
+	$dbNews = $db->query("SELECT id, xfields, category FROM " . PREFIX . "_post WHERE approve='1' AND date<'" . date ("Y-m-d H:i:s", time()) . "' {$where}");
 	$i = 0;
 	while ($row = $db->get_row($dbNews)) {
 		$xfields = xfieldsdataload($row['xfields']);
